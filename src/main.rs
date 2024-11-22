@@ -16,10 +16,10 @@ fn remove_student(notes: &mut HashMap<String, i32>, name: String) {
 }
 
 ///Get the student note for the given name
-fn get_student(notes: &mut HashMap<String, i32>, name: String) -> (String, i32) {
+fn get_student(notes: &mut HashMap<String, i32>, name: String) -> Result<i32, String> {
     match notes.get(&name) {
-        Some(&note) => (name, note),
-        None => (name, -1), // Return -1 if the student is not found in the hashmap
+        Some(&note) => Ok(note),
+        None => Err("Bad Request : Student doesn't exist".to_string()), // Return -1 if the student is not found in the hashmap
     }
 }
 
@@ -97,11 +97,10 @@ fn main() {
                 io::stdin()
                     .read_line(&mut student_name)
                     .expect("Failed to read name");
-                let (name, note) = get_student(&mut class_notes, student_name);
-                if note == -1 {
-                    println!("Student not found in the class.");
-                } else {
-                    println!("{} have the following note : {}", name.trim(), note);
+                let note = get_student(&mut class_notes, student_name.clone());
+                match note {
+                    Ok(note) => println!("{} get the note : {}", &student_name.trim(), note),
+                    Err(err) => println!("{}", err),
                 }
             }
             "4" => {
